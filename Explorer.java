@@ -111,48 +111,25 @@ public class Explorer {
 
                 break;
 
+            // case 1: //Can happen when robot starts in the middle of junction, and later returns from a different passage, leaving only one viable exit
+            //     for (int i = 0; i < 4; i++){
+            //         if ( (robot.look(lookDirections[i]) == IRobot.PASSAGE) ){
+            //             direction = lookDirections[i];
+            //         }
+            //     }
+            //     break;
 
-                // while(true){            //needed as the orientation of a junction determines where the exits lie
-                //     randno = (int) (Math.random()*4);
-                //     int randDirection = lookDirections[randno];   //probabilty is reduced but still the same for the 3 options
-
-                //     if ( robot.look(randDirection) == IRobot.PASSAGE ){
-                //         direction = randDirection;
-                //         break;
-                //     }
-                // }
-                // break;
-
-
-            case 1: //Can happen when robot starts in the middle of junction, and later returns from a different passage, leaving only one viable exit
-                for (int i = 0; i < 4; i++){
-                    if ( (robot.look(lookDirections[i]) == IRobot.PASSAGE) ){
-                        direction = lookDirections[i];
-                    }
-                }
-                break;
-            
-            
+            case 1: 
             case 2:
+            case 3:
             default:
                 do {
-                    randno = (int) (Math.random()*4);    //probabilty is reduced but still the same for the 2 options
+                    //probabilty is reduced but still the same for the 1, 2 or 3 options. This method might be slower than finding out the viable directions and then picking randomly
+                    randno = (int) (Math.random()*4);    
                     direction = lookDirections[randno];
                 } while ( robot.look(direction) != IRobot.PASSAGE );
 
-                break; 
-
-                // while(true){            //needed as the orientation of a junction determines where the exits lie
-                //     randno = (int) (Math.random()*4);
-                //     int randDirection = lookDirections[randno];  //probabilty is reduced but still the same for the 2 options
-
-                //     if ( (robot.look(lookDirections[randno]) != IRobot.WALL) && (robot.look(lookDirections[randno]) != IRobot.BEENBEFORE) ){
-                //         direction = randDirection;
-                //         break;
-                //     }
-                // }
-                // break;       
-
+                break;        
         }
 
         return direction;
@@ -175,58 +152,28 @@ public class Explorer {
                 direction = lookDirections[randno];
                 break;
 
+            // case 1:
+            //     for (int i = 0; i < 4; i++){
+            //         if ( robot.look(lookDirections[i]) == IRobot.PASSAGE ){
+            //             direction = lookDirections[i];
+            //         }
+            //     }
+            //     break;
 
-            case 1:
-                for (int i = 0; i < 4; i++){
-                    if ( robot.look(lookDirections[i]) == IRobot.PASSAGE ){
-                        direction = lookDirections[i];
-                    }
-                }
-                break;
-            
-
-            case 2:
-                do {
-                    randno = (int) (Math.random()*4);   //probabilty is reduced but still the same for the 2 options
-                    direction = lookDirections[randno]; 
-                } while (robot.look(direction) != IRobot.PASSAGE);
-
-                break;
-
-
-                // while(true){          //needed as the orientation of a viable passages changes
-                //     randno = (int) (Math.random()*4);
-                //     int randDirection = lookDirections[randno];  //probabilty is reduced but still the same for the 2 options
-
-                //     if ( robot.look(randDirection) != IRobot.BEENBEFORE ){
-                //         direction = randDirection;
-                //         break;
-                //     }
-                // }
-                // break; 
-
-
-            case 3:
+            case 1: 
+            case 2: 
+            case 3: 
+            case 4:
             default:
                 do {
-                    randno = (int) (Math.random()*4);    //probabilty is reduced but still the same for the 2 options
+                    //probabilty is reduced but still the same for the 1, 2 or 3 options. This method might be slower than finding out the viable directions and then picking randomly
+                    randno = (int) (Math.random()*4);    
                     direction = lookDirections[randno];
                 } while ( robot.look(direction) != IRobot.PASSAGE );
 
                 break;  
-
-
-                // while(true){            //needed as the orientation of a viable passages changes
-                //     randno = (int) (Math.random()*4);
-                //     int randDirection = lookDirections[randno];  //probabilty is reduced but still the same for the 2 options
-
-                //     if ( robot.look(randDirection) != IRobot.BEENBEFORE ){
-                //         direction = randDirection;
-                //         break;
-                //     }
-                // }
-                // breakk
         }
+
         return direction;
     }
 
