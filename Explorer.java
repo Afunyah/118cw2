@@ -1,11 +1,11 @@
 import uk.ac.warwick.dcs.maze.logic.IRobot;
 
-
+//DEFINE LOOKDIRECTIONS AS GLOBAL? WATCH LECTURE VIDS
 
 public class Explorer {
     public void controlRobot(IRobot robot) {
 
-        int direction;
+        int direction = 0;
         int exits = nonwallExits(robot);
 
         switch (exits){
@@ -15,10 +15,14 @@ public class Explorer {
                     break;
             case 3: direction = atJunction(robot);
                     break;
-            case 4: direction = atCrossroad(robot);
+            case 4: 
+            default:
+                    direction = atCrossroad(robot);
                     break;
         }
 
+        robot.face(direction);
+        
     }
 
 
@@ -29,9 +33,9 @@ public class Explorer {
 
         for(int i = 0; i < 4; i++){
 			if(robot.look(lookDirections[i]) != IRobot.WALL){		//check all 4 directions for exit
-				exits++;		//if exitable, increase exits count
+				exits++;		//if no wall, increase exits count
 			}
-			else continue;		//if not exitable, check next direction
+			else continue;		//if wall, check next direction
 		}
 
         return exits;
@@ -42,7 +46,7 @@ public class Explorer {
         int[] lookDirections = {IRobot.AHEAD, IRobot.BEHIND, IRobot.LEFT, IRobot.RIGHT};
         int passages = 0;
 
-        for(int i = 0; i < 4; i++){                                 //DO I REALLY NEED FIRST CONDITION SINCE LIKE THE FOLLOW WILL ONLY EVER BE CALLED COS FIRST COND IS CHECKED IN EXIT FUNC
+        for(int i = 0; i < 4; i++){
 			if( robot.look(lookDirections[i]) == IRobot.PASSAGE ){		//check all 4 directions for passage
 				passages++;		//if passage, increase passages count
 			}
@@ -57,7 +61,7 @@ public class Explorer {
     private int atDeadEnd (IRobot robot){
 
         int direction;
-        int passages = passageExits(robot);     //If atDeadEnd is being called, passagesExits returns either 0 or 1
+        int passages = passageExits(robot); //either 0 or 1
     
         switch (passages){
             case 0: direction = IRobot.BEHIND;
@@ -75,6 +79,30 @@ public class Explorer {
     private int atCorridor (IRobot robot){
 
         int direction;
+        // Tutor said maybe it does not matter to be random 
+        // int passages = passageExits(robot); //either 0, 1 or 2
+        // int[] lookDirections = {IRobot.AHEAD, IRobot.BEHIND, IRobot.LEFT, IRobot.RIGHT};
+
+        // switch (passages){
+        //     case 0:
+        //     case 1:
+        //         if (robot.look(IRobot.LEFT) != IRobot.WALL){
+        //             direction = IRobot.LEFT;
+        //         }
+        //         else if (robot.look(IRobot.RIGHT) != IRobot.WALL){
+        //             direction = IRobot.RIGHT;
+        //         }
+        //         else{
+        //             direction = IRobot.AHEAD;
+        //         } 
+        //         break;
+            
+        //     case 2:
+        //         //random, what about when facing a wall and starting, so not forward or behind
+
+        // } 
+
+        //The specs do not mention choosing a random direction when starting out in the middle of a corrider, with the walls ahead and behind.
 
         if (robot.look(IRobot.LEFT) != IRobot.WALL){
             direction = IRobot.LEFT;
@@ -83,7 +111,7 @@ public class Explorer {
             direction = IRobot.RIGHT;
         }
         else{
-            direction = IRobot.RIGHT;
+            direction = IRobot.AHEAD;
         }
 
         return direction;
@@ -95,7 +123,7 @@ public class Explorer {
     private int atJunction (IRobot robot){
 
         int direction = 0;      //intial value will be overwritten
-        int passages = passageExits(robot);
+        int passages = passageExits(robot);     //either 0, 1, 2, or 3 
 
         int[] lookDirections = {IRobot.AHEAD, IRobot.BEHIND, IRobot.LEFT, IRobot.RIGHT};
         int randno;
@@ -108,23 +136,14 @@ public class Explorer {
                     randno = (int) (Math.random()*4); //probabilty is reduced but still the same for the 3 options
                     direction = lookDirections[randno];;
                 } while (robot.look(direction) == IRobot.WALL);
-
                 break;
-
-            // case 1: //Can happen when robot starts in the middle of junction, and later returns from a different passage, leaving only one viable exit
-            //     for (int i = 0; i < 4; i++){
-            //         if ( (robot.look(lookDirections[i]) == IRobot.PASSAGE) ){
-            //             direction = lookDirections[i];
-            //         }
-            //     }
-            //     break;
 
             case 1: 
             case 2:
             case 3:
             default:
                 do {
-                    //probabilty is reduced but still the same for the 1, 2 or 3 options. This method might be slower than finding out the viable directions and then picking randomly
+                    //probabilty is reduced but still the same for the 1, 2 or 3 options. This method might be slower than [finding out the viable directions and then picking randomly]
                     randno = (int) (Math.random()*4);    
                     direction = lookDirections[randno];
                 } while ( robot.look(direction) != IRobot.PASSAGE );
@@ -139,8 +158,8 @@ public class Explorer {
 
     private int atCrossroad (IRobot robot){
 
-        int direction = 0;  //just to initialize
-        int passages = passageExits(robot);
+        int direction = 0;  //intial value will be overwritten
+        int passages = passageExits(robot);     //either 0, 1, 2, 3 or 4
 
         int[] lookDirections = {IRobot.AHEAD, IRobot.BEHIND, IRobot.LEFT, IRobot.RIGHT};
         int randno;
@@ -152,31 +171,21 @@ public class Explorer {
                 direction = lookDirections[randno];
                 break;
 
-            // case 1:
-            //     for (int i = 0; i < 4; i++){
-            //         if ( robot.look(lookDirections[i]) == IRobot.PASSAGE ){
-            //             direction = lookDirections[i];
-            //         }
-            //     }
-            //     break;
-
             case 1: 
             case 2: 
             case 3: 
             case 4:
             default:
                 do {
-                    //probabilty is reduced but still the same for the 1, 2 or 3 options. This method might be slower than finding out the viable directions and then picking randomly
+                    //probabilty is reduced but still the same for the 1, 2 or 3 options. This method might be slower than [finding out the viable directions and then picking randomly]
                     randno = (int) (Math.random()*4);    
                     direction = lookDirections[randno];
                 } while ( robot.look(direction) != IRobot.PASSAGE );
-
                 break;  
         }
 
         return direction;
     }
-
 
 
 }
