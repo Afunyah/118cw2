@@ -1,15 +1,48 @@
 import uk.ac.warwick.dcs.maze.logic.IRobot;
 
-//DEFINE LOOKDIRECTIONS AS GLOBAL? WATCH LECTURE VIDS
+//Function that checks all 4 walls for a specific condition eg passage wall beenbefore
+//Maybe headers to do the orientation of juctions thing, crossroads as well? im not thinkingj right now so i do not really know at the moment
+//Check feedback to confirm whether random approach of selecting exits was appropriate
+// should explorecontrol return a direction and then control robot faces the direction? and pollrun as well
+//ask about initial heading and absolute heading
+
 
 public class Explorer {
+
+    private int pollRun = 0; // Incremented after each pass
+    private RobotData robotData; // Data store for junctions
+    private int explorerMode; // 1 = explore, 0 = backtrack
+
+    int[] lookDirections = {IRobot.AHEAD, IRobot.BEHIND, IRobot.LEFT, IRobot.RIGHT};
+
     public void controlRobot(IRobot robot) {
 
+        // On the first move of the first run of a new maze
+        if ((robot.getRuns() == 0) && (pollRun == 0)){
+            robotData = new RobotData(); //reset the data store
+            explorerMode = 1;
+        }
+
+        exploreControl(robot); 
+
+    }
+
+
+    public void reset() {
+        System.out.println("****************RESET**************");
+        robotData.resetJunctionCounter();
+        explorerMode = 1;
+    }
+
+
+    private void exploreControl(IRobot robot) {
         int direction = 0;
+        int beenBefores = beenBeforeExits(robot);
         int exits = nonwallExits(robot);
 
         switch (exits){
-            case 1: direction = atDeadEnd(robot);       
+            case 1: direction = atDeadEnd(robot);
+                    if (beenBefores == 1){ explorerMode = 0; }      
                     break;
             case 2: direction = atCorridor(robot);
                     break;
@@ -21,14 +54,40 @@ public class Explorer {
                     break;
         }
 
+        //robotData.searchJunction(robot.getLocation().x, robot.getLocation().y);
+
+        if ( (beenBefores == 1) && (exits >= 3) ){    //at a previously unecountered junction/crossroad 
+            robotData.recordJunction(robot.getLocation().x, robot.getLocation().y, robot.getHeading());
+            JunctionRecorder.printJunction();
+        }
+
+
         robot.face(direction);
-        
+
+        pollRun++; // Increment pollRun so that the data is not reset each time the robot moves
     }
 
 
+    public void backtrackControl(IRobot robot) {
+        int direction = 0;
+        int passages = passageExits(robot);
+        int exits = nonwallExits(robot);
+
+        if (exits > 2){
+            if (passages > 0){
+                explorerMode = 1;
+            }
+            else{
+                int intialHeading = searchJunction(robot.getLocation().x, robot.getLocation().y);
+            }
+        }
+
+    }
+
+
+  
     private int nonwallExits (IRobot robot){
 
-        int[] lookDirections = {IRobot.AHEAD, IRobot.BEHIND, IRobot.LEFT, IRobot.RIGHT};
         int exits = 0;
 
         for(int i = 0; i < 4; i++){
@@ -37,13 +96,12 @@ public class Explorer {
 			}
 			else continue;		//if wall, check next direction
 		}
-
         return exits;
     }
 
+
     private int passageExits (IRobot robot){
 
-        int[] lookDirections = {IRobot.AHEAD, IRobot.BEHIND, IRobot.LEFT, IRobot.RIGHT};
         int passages = 0;
 
         for(int i = 0; i < 4; i++){
@@ -52,56 +110,41 @@ public class Explorer {
 			}
 			else continue;		//if no passage, check next direction
 		}
-
         return passages;
+    }
 
+
+    private int beenBeforeExits (IRobot robot){
+
+        int beenBefores = 0;
+
+        for(int i = 0; i < 4; i++){
+			if( robot.look(lookDirections[i]) == IRobot.BEENBEFORE ){		//check all 4 directions for beenbefore
+				beenBefores++;		//if beenbefore, increase passages count
+			}
+			else continue;		//if no beenbefore, check next direction
+		}
+        return beenBefores;
     }
 
 
     private int atDeadEnd (IRobot robot){
 
-        int direction;
-        int passages = passageExits(robot); //either 0 or 1
-    
-        switch (passages){
-            case 0: direction = IRobot.BEHIND;
-                    break;
-            case 1:
-            default: direction = IRobot.AHEAD;  
-                    break;
+        int direction = 0;
+        
+        for(int i = 0; i < 4; i++){
+            if(robot.look(lookDirections[i]) != IRobot.WALL){
+                direction = lookDirections[i];
+                break;
+            }
         }
-
         return direction;
     }
-
 
 
     private int atCorridor (IRobot robot){
 
         int direction;
-        // Tutor said maybe it does not matter to be random 
-        // int passages = passageExits(robot); //either 0, 1 or 2
-        // int[] lookDirections = {IRobot.AHEAD, IRobot.BEHIND, IRobot.LEFT, IRobot.RIGHT};
-
-        // switch (passages){
-        //     case 0:
-        //     case 1:
-        //         if (robot.look(IRobot.LEFT) != IRobot.WALL){
-        //             direction = IRobot.LEFT;
-        //         }
-        //         else if (robot.look(IRobot.RIGHT) != IRobot.WALL){
-        //             direction = IRobot.RIGHT;
-        //         }
-        //         else{
-        //             direction = IRobot.AHEAD;
-        //         } 
-        //         break;
-            
-        //     case 2:
-        //         //random, what about when facing a wall and starting, so not forward or behind
-
-        // } 
-
         //The specs do not mention choosing a random direction when starting out in the middle of a corrider, with the walls ahead and behind.
 
         if (robot.look(IRobot.LEFT) != IRobot.WALL){
@@ -115,77 +158,165 @@ public class Explorer {
         }
 
         return direction;
-
     }
-
 
 
     private int atJunction (IRobot robot){
-
-        int direction = 0;      //intial value will be overwritten
-        int passages = passageExits(robot);     //either 0, 1, 2, or 3 
-
-        int[] lookDirections = {IRobot.AHEAD, IRobot.BEHIND, IRobot.LEFT, IRobot.RIGHT};
+        int passages = passageExits(robot);
+        int direction;
         int randno;
 
-
-        switch (passages){
-            
-            case 0:
-                do {
+        if (passages == 0){
+             do {
                     randno = (int) (Math.random()*4); //probabilty is reduced but still the same for the 3 options
                     direction = lookDirections[randno];;
                 } while (robot.look(direction) == IRobot.WALL);
-                break;
 
-            case 1: 
-            case 2:
-            case 3:
-            default:
-                do {
-                    //probabilty is reduced but still the same for the 1, 2 or 3 options. This method might be slower than [finding out the viable directions and then picking randomly]
-                    randno = (int) (Math.random()*4);    
-                    direction = lookDirections[randno];
-                } while ( robot.look(direction) != IRobot.PASSAGE );
-
-                break;        
+        } else{
+            //for cases 1, 2 and 3
+            do {
+                randno = (int) (Math.random()*4); //probabilty is reduced but still the same for the 3 options
+                direction = lookDirections[randno];;
+                } while (robot.look(direction) != IRobot.PASSAGE);
         }
 
         return direction;
     }
-
 
 
     private int atCrossroad (IRobot robot){
-
-        int direction = 0;  //intial value will be overwritten
-        int passages = passageExits(robot);     //either 0, 1, 2, 3 or 4
-
-        int[] lookDirections = {IRobot.AHEAD, IRobot.BEHIND, IRobot.LEFT, IRobot.RIGHT};
+        
+        int passages = passageExits(robot);
+        int direction;
         int randno;
 
-        switch (passages){
+        if (passages == 0){
+            randno = (int) (Math.random()*4);
+            direction = lookDirections[randno];
 
-            case 0:
-                randno = (int) (Math.random()*4);
+        } else{ //For cases 1, 2, 3 and 4.
+            do {
+                // probabilty is reduced but still the same for the 1, 2 or 3 options. This method might be slower than [finding out the viable directions and then picking randomly]
+                randno = (int) (Math.random()*4);    
                 direction = lookDirections[randno];
-                break;
-
-            case 1: 
-            case 2: 
-            case 3: 
-            case 4:
-            default:
-                do {
-                    //probabilty is reduced but still the same for the 1, 2 or 3 options. This method might be slower than [finding out the viable directions and then picking randomly]
-                    randno = (int) (Math.random()*4);    
-                    direction = lookDirections[randno];
                 } while ( robot.look(direction) != IRobot.PASSAGE );
-                break;  
         }
-
+        
+        // int direction = atJunction(robot); Since junction and crossroads are almost the same
         return direction;
     }
 
+
+}
+
+
+
+class RobotData {
+
+    private static int maxJunctions = 10000; // Max number likely to occur
+    private static int junctionCounter = 0; // No. of junctions stored
+    private static JunctionRecorder[] junctionRecorderArray = new JunctionRecorder[maxJunctions];
+
+    public static int getJunctionCounter(){
+        return junctionCounter;
+    }
+
+    public void resetJunctionCounter() {
+        junctionCounter = 0;
+    }
+
+    public void recordJunction(int robotX, int robotY, int arrived) {
+        
+        JunctionRecorder newJunction = new JunctionRecorder(robotX, robotY, arrived);
+        junctionRecorderArray[junctionCounter] = newJunction;
+        junctionCounter++;
+        //System.out.println(newJunction.juncX);
+        
+    }
+
+    public int searchJunction(int robotX, int robotY) {
+        int heading = 0;
+        for(int i = 0; i < maxJunctions; i++){
+            if ( (junctionRecorderArray[i].getJuncX() == robotX) && (junctionRecorderArray[i].getJuncY() == robotY) ){
+                System.out.println("same junc");
+                heading = junctionRecorderArray[i].getRelativeArrived();
+                break;
+            }
+        }
+        return heading;
+    }
+
+}
+
+
+
+class JunctionRecorder {
+
+    private static int juncX; // X-coordinates of the junctions
+    private static int juncY; // Y-coordinates of the junctions
+    private static int arrived; // Heading the robot first arrived from (Absolute)
+    private static int relativeArrived; // Initial heading of robot (Relative)
+
+    public JunctionRecorder(int juncX, int juncY, int arrived){
+
+        this.juncX = juncX;
+        this.juncY = juncY;
+        this.relativeArrived = arrived;
+        this.arrived = toAbsoluteHeading(arrived); //Absolute heading as per the specs
+
+    }
+
+    public static int getJuncX(){
+        return juncX;
+    }
+
+    public static int getJuncY(){
+        return juncY;
+    }
+
+    public static int getArrived(){
+        return arrived;
+    }
+
+    public static int getRelativeArrived(){
+        return relativeArrived;
+    }
+
+
+    public int toAbsoluteHeading(int heading){
+        int absDir;
+
+        switch (heading){
+            case IRobot.NORTH:  absDir = IRobot.SOUTH;
+                                break;
+            case IRobot.SOUTH:  absDir = IRobot.NORTH;
+                                break;
+            case IRobot.EAST:  absDir = IRobot.WEST;
+                                break;
+            case IRobot.WEST:  
+            default:            absDir = IRobot.EAST;
+                                break;
+        }
+
+        return absDir;
+    }
+    
+     public static void printJunction(){
+         String arrivedString = "";
+         
+         switch (arrived){
+            case IRobot.NORTH: arrivedString = "NORTH";
+                                break;
+            case IRobot.SOUTH: arrivedString = "SOUTH";
+                                break;
+            case IRobot.EAST: arrivedString = "EAST";
+                                break;
+            case IRobot.WEST: arrivedString = "WEST";
+                                break;     
+         }
+
+        System.out.println("Junction " + RobotData.getJunctionCounter() + " (x="+ juncX + ",y=" + juncY + ") heading "+ arrivedString);
+    }
+    
 
 }
