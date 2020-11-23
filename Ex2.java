@@ -4,11 +4,11 @@ import uk.ac.warwick.dcs.maze.logic.IRobot;
 //Check feedback to confirm whether random approach of selecting exits was appropriate
 //Better explore control backtrack cintrol interface 
 //numeric notation for absoslute heading
-//arraylists
-//if look heading is used, implement try catch to get absolute direction from numeric notation.
+//arraylists for max junctions etc
+//ARRIVED STRING FOR LOOP EXERCISE 1
+//WHAT HAPEN WHEN START ON JUNCTION CENTR EXERCISE 1
 
-
-public class Explorer {
+public class Ex2 {
 
     private int pollRun = 0; // Incremented after each pass
     private RobotData robotData; // Data store for junctions
@@ -241,7 +241,7 @@ class RobotData {
 
     private static int maxJunctions = 10000; // Max number likely to occur
     private static int junctionCounter = 0; // No. of junctions stored
-    private static JunctionRecorder[] junctionRecorderArray = new JunctionRecorder[maxJunctions];
+    private static JunctionHeader[] JunctionHeaderArray = new JunctionHeader[maxJunctions];
 
     public static int getJunctionCounter(){
         return junctionCounter;
@@ -251,16 +251,18 @@ class RobotData {
         junctionCounter = 0;
     }
 
-    public void recordJunction(int robotX, int robotY, int arrived) {
+    public void recordJunctionHeader(int arrived) {
         
-        JunctionRecorder newJunction = new JunctionRecorder(robotX, robotY, arrived);
+        JunctionHeader newJunctionHeader = new JunctionHeader(arrived);
         newJunction.printJunction();
 
-        junctionRecorderArray[junctionCounter] = newJunction;
+        JunctionHeaderArray[junctionCounter] = newJunctionHeader;
         junctionCounter++;
     }
 
-    public int searchJunction(int robotX, int robotY) {
+    public void deleteJunctionHeader(){}
+
+    public int searchJunctionHeader(int arrived) {
         int heading = 0;
         for(int i = 0; i < maxJunctions; i++){
             if ( (junctionRecorderArray[i].getJuncX() == robotX) && (junctionRecorderArray[i].getJuncY() == robotY) ){
@@ -311,14 +313,6 @@ class JunctionRecorder {
             absDir = heading - 2;
         }
 
-        // try {
-        //     absDir = heading + 2;
-            
-        // } catch(Exception e){
-        //     absDir = heading - 2;
-        // }
-
-
         // switch (heading){
         //     case IRobot.NORTH:  absDir = IRobot.SOUTH;
         //                         break;
@@ -347,8 +341,8 @@ class JunctionRecorder {
                 continue;
             }
         }
-
-        // switch (arrived){
+         
+        //  switch (arrived){
         //     case IRobot.NORTH: arrivedString = "NORTH";
         //                         break;
         //     case IRobot.SOUTH: arrivedString = "SOUTH";
@@ -357,10 +351,42 @@ class JunctionRecorder {
         //                         break;
         //     case IRobot.WEST: arrivedString = "WEST";
         //                         break;     
-        // }
+        //  }
 
         System.out.println("Junction " + (RobotData.getJunctionCounter()+1) + " (x="+ juncX + ",y=" + juncY + ") heading "+ arrivedString);
     }
     
+
+}
+
+class JunctionHeader{
+
+    private int arrived;
+
+    public JunctionHeader(int arrived){
+        this.arrived = getAbsoluteHeading(arrived);
+    }
+
+    public int getArrived(){
+        return arrived;
+    }
+
+    private int getAbsoluteHeading(int heading){
+        int absDir;
+
+        switch (heading){
+            case IRobot.NORTH:  absDir = IRobot.SOUTH;
+                                break;
+            case IRobot.SOUTH:  absDir = IRobot.NORTH;
+                                break;
+            case IRobot.EAST:   absDir = IRobot.WEST;
+                                break;
+            case IRobot.WEST:  
+            default:            absDir = IRobot.EAST;
+                                break;
+        }
+
+        return absDir;
+    }
 
 }
