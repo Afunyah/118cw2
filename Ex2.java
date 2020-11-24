@@ -280,24 +280,12 @@ class RobotData {
 
 class JunctionRecorder {
 
-    private int juncX; // X-coordinates of the junctions
-    private int juncY; // Y-coordinates of the junctions
     private int arrived; // Heading the robot first arrived from (Absolute)
 
     public JunctionRecorder(int juncX, int juncY, int arrived){
 
-        this.juncX = juncX;
-        this.juncY = juncY;
         this.arrived = getAbsoluteHeading(arrived); //Absolute heading as per the specs
 
-    }
-
-    public int getJuncX(){
-        return juncX;
-    }
-
-    public int getJuncY(){
-        return juncY;
     }
 
     public int getArrived(){
