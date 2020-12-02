@@ -66,17 +66,13 @@ public class Ex1 {
             case 3: 
                     if (beenBefores == 3){
                         explorerMode = 0;
-                    }else{
-                        direction = atJunction(robot);
                     }
-                    break;
-
             case 4: 
             default:
                     if (beenBefores == 4){
                         explorerMode = 0;
-                    }else{
-                        direction = atCrossroad(robot);
+                    } else{
+                        direction = atJunction(robot);
                     }
                     break;
         }
@@ -182,9 +178,9 @@ public class Ex1 {
     }
 
 
-    private int atCrossroad (IRobot robot){
-        return atJunction(robot);
-    }
+    // private int atCrossroad (IRobot robot){
+    //     return atJunction(robot);
+    // }
 
 
 

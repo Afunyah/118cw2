@@ -51,51 +51,31 @@ public class Ex3 {
         switch (exits){
             case 1: 
                     if (beenBefores == 1){ 
+                        direction = IRobot.BEHIND;
                         explorerMode = 0;
-                        backtrackControl(robot);
                     }else{
                         direction = atDeadEnd(robot);
-                        robot.face(direction);
                     }      
                     break;
 
             case 2: direction = atCorridor(robot);
-                    robot.face(direction);
                     break;
 
             case 3: 
-                     if (beenBefores <= 2){
+            case 4: 
+            default: 
+                    if (beenBefores < 3){
                         RobotDataEx3.recordJunction(robot.getHeading());
                         direction = atJunction(robot);
-                        robot.face(direction);
                     }
-                    else if (beenBefores == 3){
+                    else {
                         direction = IRobot.BEHIND;
-                        robot.face(direction);
-                        explorerMode = 0;
-                    }
-                    break;
-
-            case 4: 
-            default:
-                    //bb 2 as BTing? so no need here? 
-                    if (beenBefores == 1){
-                        RobotDataEx3.recordJunction(robot.getHeading());
-                        direction = atCrossroad(robot);
-                        robot.face(direction);
-                    }
-                    else if (beenBefores == 3 ){
-                        direction = IRobot.BEHIND;
-                        robot.face(direction);
-                        explorerMode = 0;
-                    }
-                    else if (beenBefores == 4){
-                        direction = IRobot.BEHIND;
-                        robot.face(direction);
                         explorerMode = 0;
                     }
                     break;
         }
+
+        robot.face(direction);
         
     }
 
@@ -183,24 +163,20 @@ public class Ex3 {
         int direction;
         int randno;
 
-         
             do {
                 randno = (int) (Math.random()*4); //probabilty is reduced but still the same for the 3 options
                 direction = lookDirections[randno];;
                 } while (robot.look(direction) != IRobot.PASSAGE);
         
-
         return direction;
     }
 
 
-    private int atCrossroad (IRobot robot){
+    // private int atCrossroad (IRobot robot){
         
-        return atJunction(robot);
+    //     return atJunction(robot);
 
-    }
-
-
+    // }
 
 }
 
@@ -225,7 +201,7 @@ class RobotDataEx3 {
     public void recordJunction(int arrived) {
         
         JunctionRecorderEx3 JunctionRecorder = new JunctionRecorderEx3(arrived);
-        JunctionRecorder.printJunctionHeader();
+        JunctionRecorder.printJunction();
 
         junctionRecorderArray.add(JunctionRecorder);
         junctionCounter++;
@@ -252,7 +228,6 @@ class RobotDataEx3 {
         return header;
     }
 
-
 }
 
 
@@ -265,11 +240,11 @@ class JunctionRecorderEx3{
         this.arrived = getAbsoluteHeading(arrived);
     }
 
+
     public int getArrived(){
-        System.out.println(arrived);
         return arrived;
-        
     }
+
 
     private int getAbsoluteHeading(int heading){
         int absDir;
@@ -283,7 +258,8 @@ class JunctionRecorderEx3{
         return absDir;
     }
 
-    public void printJunctionHeader(){
+
+    public void printJunction(){
         int[] headers = {IRobot.NORTH, IRobot.SOUTH, IRobot.EAST, IRobot.WEST};
         String[] headerStrings = {"NORTH", "SOUTH", "EAST", "WEST"};
 
@@ -296,7 +272,6 @@ class JunctionRecorderEx3{
                 continue;
             }
         }
-
 
         System.out.println("Junction " + (RobotDataEx3.getJunctionCounter()+1) +  " heading "+ arrivedString);
     }

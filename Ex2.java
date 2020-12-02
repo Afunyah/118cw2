@@ -48,9 +48,7 @@ public class Ex2 {
         int exits = pathTypeCheck(robot, IRobot.WALL);
 
         if ( (beenBefores == 1) && (exits > 2) ){    //at a previously unecountered junction/crossroad 
-        System.out.println("rh: "+ robot.getHeading());
             RobotDataEx2.recordJunction(robot.getHeading());
-            //JunctionRecorder.printJunction();
         }
 
         switch (exits){
@@ -68,17 +66,13 @@ public class Ex2 {
             case 3: 
                     if (beenBefores == 3){
                         explorerMode = 0;
-                    }else{
-                        direction = atJunction(robot);
                     }
-                    break;
-
             case 4: 
             default:
                     if (beenBefores == 4){
                         explorerMode = 0;
-                    }else{
-                        direction = atCrossroad(robot);
+                    } else{
+                        direction = atJunction(robot);
                     }
                     break;
         }
@@ -186,11 +180,11 @@ public class Ex2 {
     }
 
 
-    private int atCrossroad (IRobot robot){
+    // private int atCrossroad (IRobot robot){
         
-        return atJunction(robot);
+    //     return atJunction(robot);
 
-    }
+    // }
 
 
 
@@ -215,7 +209,7 @@ class RobotDataEx2 {
     public void recordJunction(int arrived) {
         
         JunctionRecorderEx2 newJunctionRecorder = new JunctionRecorderEx2(arrived);
-        newJunctionRecorder.printJunctionHeader();
+        newJunctionRecorder.printJunction();
 
         junctionRecorderArray.add(newJunctionRecorder);
         junctionCounter++;
@@ -254,9 +248,7 @@ class JunctionRecorderEx2{
     }
 
     public int getArrived(){
-        System.out.println(arrived);
         return arrived;
-        
     }
 
     private int getAbsoluteHeading(int heading){
@@ -271,7 +263,7 @@ class JunctionRecorderEx2{
         return absDir;
     }
 
-    public void printJunctionHeader(){
+    public void printJunction(){
         int[] headers = {IRobot.NORTH, IRobot.SOUTH, IRobot.EAST, IRobot.WEST};
         String[] headerStrings = {"NORTH", "SOUTH", "EAST", "WEST"};
 
