@@ -25,11 +25,9 @@ public class Ex2 {
 
         if (explorerMode == 1){
             exploreControl(robot);
-            System.out.println("EX");
         }
         else{ //exmode 0
             backtrackControl(robot);
-            System.out.println("BT");
         }
          
         pollRun++; // Increment pollRun so that the data is not reset each time the robot moves
@@ -46,8 +44,8 @@ public class Ex2 {
 
     private void exploreControl(IRobot robot) {
         int direction = 0;
-        int beenBefores = beenBeforeExits(robot);
-        int exits = nonwallExits(robot);
+        int beenBefores = pathTypeCheck(robot, IRobot.BEENBEFORE);
+        int exits = pathTypeCheck(robot, IRobot.WALL);
 
         if ( (beenBefores == 1) && (exits > 2) ){    //at a previously unecountered junction/crossroad 
         System.out.println("rh: "+ robot.getHeading());
@@ -97,8 +95,8 @@ public class Ex2 {
 
     public void backtrackControl(IRobot robot) {
         int direction = 0;
-        int passages = passageExits(robot);
-        int exits = nonwallExits(robot);
+        int passages = pathTypeCheck(robot, IRobot.PASSAGE);
+        int exits = pathTypeCheck(robot, IRobot.WALL);
 
         if (exits > 2){
             if (passages > 0){
@@ -121,47 +119,21 @@ public class Ex2 {
 
     }
 
-
   
-    private int nonwallExits (IRobot robot){
-
-        int exits = 0;
-
-        for(int i = 0; i < 4; i++){
-			if(robot.look(lookDirections[i]) != IRobot.WALL){		//check all 4 directions for exit
-				exits++;		//if no wall, increase exits count
-			}
-			else continue;		//if wall, check next direction
-		}
-        return exits;
-    }
-
-
-    private int passageExits (IRobot robot){
-
-        int passages = 0;
+    private int pathTypeCheck (IRobot robot, int pathType){
+        int pathCounter = 0;
 
         for(int i = 0; i < 4; i++){
-			if( robot.look(lookDirections[i]) == IRobot.PASSAGE ){		//check all 4 directions for passage
-				passages++;		//if passage, increase passages count
-			}
-			else continue;		//if no passage, check next direction
+            if( robot.look(lookDirections[i]) == pathType ){
+                pathCounter++;
+            }
 		}
-        return passages;
-    }
 
+        if(pathType == IRobot.WALL){
+            pathCounter = 4 - pathCounter;
+        }
 
-    private int beenBeforeExits (IRobot robot){
-
-        int beenBefores = 0;
-
-        for(int i = 0; i < 4; i++){
-			if( robot.look(lookDirections[i]) == IRobot.BEENBEFORE ){		//check all 4 directions for beenbefore
-				beenBefores++;		//if beenbefore, increase passages count
-			}
-			else continue;		//if no beenbefore, check next direction
-		}
-        return beenBefores;
+        return pathCounter;
     }
 
 
@@ -199,7 +171,7 @@ public class Ex2 {
 
 
     private int atJunction (IRobot robot){
-        int passages = passageExits(robot);
+        int passages = pathTypeCheck(robot, IRobot.PASSAGE);
         int direction;
         int randno;
 
