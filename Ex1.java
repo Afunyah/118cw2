@@ -4,8 +4,6 @@ import java.util.ArrayList;
 //Function that checks all 4 walls for a specific condition eg passage wall beenbefore
 //Check feedback to confirm whether random approach of selecting exits was appropriate
 //Better explore control backtrack cintrol interface 
-//numeric notation for absoslute heading
-//arraylists
 //if look heading is used, implement try catch to get absolute direction from numeric notation.
 
 
@@ -218,17 +216,6 @@ public class Ex1 {
         
         return atJunction(robot);
 
-        // int passages = passageExits(robot);
-        // int direction;
-        // int randno;
-
-        //     do {
-        //         // probabilty is reduced but still the same for the 1, 2 or 3 options. This method might be slower than [finding out the viable directions and then picking randomly]
-        //         randno = (int) (Math.random()*4);    
-        //         direction = lookDirections[randno];
-        //         } while ( robot.look(direction) != IRobot.PASSAGE );
-    
-        // return direction;
     }
 
 
@@ -310,18 +297,6 @@ class JunctionRecorder {
         } else{
             absDir = heading - 2;
         }
-
-        // switch (heading){
-        //     case IRobot.NORTH:  absDir = IRobot.SOUTH;
-        //                         break;
-        //     case IRobot.SOUTH:  absDir = IRobot.NORTH;
-        //                         break;
-        //     case IRobot.EAST:   absDir = IRobot.WEST;
-        //                         break;
-        //     case IRobot.WEST:  
-        //     default:            absDir = IRobot.EAST;
-        //                         break;
-        // }
 
         return absDir;
     }

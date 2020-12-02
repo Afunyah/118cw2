@@ -4,8 +4,6 @@ import java.util.ArrayList;
 //Function that checks all 4 walls for a specific condition eg passage wall beenbefore
 //Check feedback to confirm whether random approach of selecting exits was appropriate
 //Better explore control backtrack cintrol interface 
-//numeric notation for absoslute heading
-//arraylists for max junctions etc
 //ARRIVED STRING FOR LOOP EXERCISE 1
 //WHAT HAPEN WHEN START ON JUNCTION CENTR EXERCISE 1
 
@@ -53,7 +51,7 @@ public class Ex2 {
 
         if ( (beenBefores == 1) && (exits > 2) ){    //at a previously unecountered junction/crossroad 
         System.out.println("rh: "+ robot.getHeading());
-            RobotDataEx2.recordJunctionHeader(robot.getHeading());
+            RobotDataEx2.recordJunction(robot.getHeading());
             //JunctionRecorder.printJunction();
         }
 
@@ -108,7 +106,7 @@ public class Ex2 {
                 exploreControl(robot);
             }
             else{
-                int heading = RobotDataEx2.retrieveJunctionHeading();
+                int heading = RobotDataEx2.retrieveJunctionRecorder();
                 robot.setHeading(heading);
             }
         }
@@ -220,17 +218,6 @@ public class Ex2 {
         
         return atJunction(robot);
 
-        // int passages = passageExits(robot);
-        // int direction;
-        // int randno;
-
-        //     do {
-        //         // probabilty is reduced but still the same for the 1, 2 or 3 options. This method might be slower than [finding out the viable directions and then picking randomly]
-        //         randno = (int) (Math.random()*4);    
-        //         direction = lookDirections[randno];
-        //         } while ( robot.look(direction) != IRobot.PASSAGE );
-    
-        // return direction;
     }
 
 
@@ -242,7 +229,7 @@ public class Ex2 {
 class RobotDataEx2 {
 
     private static int junctionCounter = 0; // No. of junctions stored
-    private static ArrayList<JunctionHeader> junctionHeaderArray = new ArrayList<JunctionHeader>();
+    private static ArrayList<JunctionRecorderEx2> junctionRecorderArray = new ArrayList<JunctionRecorderEx2>();
 
     public static int getJunctionCounter(){
         return junctionCounter;
@@ -250,34 +237,29 @@ class RobotDataEx2 {
 
     public void resetJunctionData() {
         junctionCounter = 0;
-        junctionHeaderArray.clear();
+        junctionRecorderArray.clear();
     }
 
-    public void recordJunctionHeader(int arrived) {
+    public void recordJunction(int arrived) {
         
-        JunctionHeader newJunctionHeader = new JunctionHeader(arrived);
-        newJunctionHeader.printJunctionHeader();
+        JunctionRecorderEx2 newJunctionRecorder = new JunctionRecorderEx2(arrived);
+        newJunctionRecorder.printJunctionHeader();
 
-        junctionHeaderArray.add(newJunctionHeader);
-        System.out.println("Storing: " + junctionHeaderArray.get(junctionCounter) + "  " + junctionCounter + " "+ (junctionHeaderArray.get(junctionCounter)).getArrived());
+        junctionRecorderArray.add(newJunctionRecorder);
         junctionCounter++;
     }
 
-    public void deleteJunctionHeader(){
-        System.out.println("Deleting: " + junctionHeaderArray.get(junctionCounter-1));
-        junctionHeaderArray.remove(junctionCounter-1);
-
-        System.out.println("Counter from: " + junctionCounter + " to " + (junctionCounter-1));
+    public void deleteJunctionRecorder(){
+        junctionRecorderArray.remove(junctionCounter-1);
         junctionCounter--;
     }
 
-    public int retrieveJunctionHeading() {
+    public int retrieveJunctionRecorder() {
         int header;
         try{
-            JunctionHeader currentJunction = junctionHeaderArray.get(junctionCounter-1);
+            JunctionRecorderEx2 currentJunction = junctionRecorderArray.get(junctionCounter-1);
             header = currentJunction.getArrived();
-            System.out.println("Retrieving "+ currentJunction + "  "+(junctionCounter-1) + " " + header);
-            deleteJunctionHeader();
+            deleteJunctionRecorder();
         } catch(Exception e){
             System.out.println("TargetUnreachableException: No more explorable paths.");
             header = IRobot.NORTH;
@@ -291,11 +273,11 @@ class RobotDataEx2 {
 
 
 
-class JunctionHeader{
+class JunctionRecorderEx2{
 
     private int arrived;
 
-    public JunctionHeader(int arrived){
+    public JunctionRecorderEx2(int arrived){
         this.arrived = getAbsoluteHeading(arrived);
     }
 
@@ -313,17 +295,6 @@ class JunctionHeader{
         } else{
             absDir = heading - 2;
         }
-        // switch (heading){
-        //     case IRobot.NORTH:  absDir = IRobot.SOUTH;
-        //                         break;
-        //     case IRobot.SOUTH:  absDir = IRobot.NORTH;
-        //                         break;
-        //     case IRobot.EAST:   absDir = IRobot.WEST;
-        //                         break;
-        //     case IRobot.WEST:  
-        //     default:            absDir = IRobot.EAST;
-        //                         break;
-        // }
 
         return absDir;
     }
