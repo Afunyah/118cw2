@@ -9,10 +9,12 @@ import java.util.ArrayList;
 //ARRIVED STRING FOR LOOP EXERCISE 1
 //WHAT HAPEN WHEN START ON JUNCTION CENTR EXERCISE 1
 
-public class Ex2 {
+//Switching controllers within themselves maybe is not the best solution. get better inerfacing.
+
+public class Ex3 {
 
     private int pollRun = 0; // Incremented after each pass
-    private RobotDataEx2 RobotDataEx2; // Data store for junctions
+    private RobotDataEx3 RobotDataEx3; // Data store for junctions
     private int explorerMode; // 1 = explore, 0 = backtrack
 
     int[] lookDirections = {IRobot.AHEAD, IRobot.BEHIND, IRobot.LEFT, IRobot.RIGHT};
@@ -21,7 +23,7 @@ public class Ex2 {
 
         // On the first move of the first run of a new maze
         if ((robot.getRuns() == 0) && (pollRun == 0)){
-            RobotDataEx2 = new RobotDataEx2(); //reset the data store
+            RobotDataEx3 = new RobotDataEx3(); //reset the data store
             explorerMode = 1;
         }
 
@@ -41,7 +43,7 @@ public class Ex2 {
 
     public void reset() {
         System.out.println("****************RESET**************");
-        RobotDataEx2.resetJunctionData();
+        RobotDataEx3.resetJunctionData();
         explorerMode = 1;
     }
 
@@ -51,64 +53,106 @@ public class Ex2 {
         int beenBefores = beenBeforeExits(robot);
         int exits = nonwallExits(robot);
 
-        if ( (beenBefores == 1) && (exits > 2) ){    //at a previously unecountered junction/crossroad 
-        System.out.println("rh: "+ robot.getHeading());
-            RobotDataEx2.recordJunctionHeader(robot.getHeading());
-            //JunctionRecorder.printJunction();
-        }
+        
 
+        // if ( (beenBefores == 1) && (exits > 2) ){    //at a previously unecountered junction/crossroad 
+        // System.out.println("rh: "+ robot.getHeading());
+        //     RobotDataEx3.recordJunctionHeader(robot.getHeading());
+        //     //JunctionRecorder.printJunction();
+        // }
+    //  System.out.println(beenBefores);
+    //  System.out.println(exits);
         switch (exits){
             case 1: 
                     if (beenBefores == 1){ 
                         explorerMode = 0;
+                        backtrackControl(robot);
                     }else{
                         direction = atDeadEnd(robot);
+                        robot.face(direction);
                     }      
                     break;
 
             case 2: direction = atCorridor(robot);
+                    robot.face(direction);
+                    // if (beenBefores == 2){
+                    //     explorerMode = 0;
+                    // } always prevents 3 from running
                     break;
 
             case 3: 
-                    if (beenBefores == 3){
-                        explorerMode = 0;
-                    }else{
+                    // if (beenBefores == 2){
+                    //     explorerMode = 0;
+                    //     backtrackControl(robot);
+                    // }
+                     if (beenBefores <= 2){
+                         RobotDataEx3.recordJunctionHeader(robot.getHeading());
                         direction = atJunction(robot);
+                        robot.face(direction);
+                    }
+
+                    else if (beenBefores == 3){
+                        System.out.println("ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss");
+                        direction = IRobot.BEHIND;
+                        robot.face(direction);
+                        explorerMode = 0;
                     }
                     break;
 
             case 4: 
             default:
-                    if (beenBefores == 4){
-                        explorerMode = 0;
-                    }else{
+                    // if (beenBefores == 4){
+                    //     explorerMode = 0;
+                    //     backtrackControl(robot);
+                    // }//bb 2 as BTing? so no need here? 
+                     if (beenBefores == 1){
+                         RobotDataEx3.recordJunctionHeader(robot.getHeading());
                         direction = atCrossroad(robot);
+                        robot.face(direction);
+                    }
+                    else if (beenBefores == 3 ){
+                        direction = IRobot.BEHIND;
+                        robot.face(direction);
+                        explorerMode = 0;
+                    }
+                    else if (beenBefores == 4){
+                        direction = IRobot.BEHIND;
+                        robot.face(direction);
+                        explorerMode = 0;
                     }
                     break;
         }
 
 
-        if(explorerMode == 0){
-            backtrackControl(robot);
-        }else{
-            robot.face(direction);
-        }
+        // if(explorerMode == 0){
+        //     backtrackControl(robot);
+        // }else{
+        //     robot.face(direction);
+        // }
         
     }
 
+
+//for junctions, if passages are 0 and exploring, just reverse and BT, [normal: bt and exit through first entrance]
+
+//for cr, if passages are less than 2 (0 or 1) and exploring, just reverse and BT, [normal: 0-bt and exit through first entrance. 1-expl exit through passage]
+
+//redesign ex and bt handling
 
     public void backtrackControl(IRobot robot) {
         int direction = 0;
         int passages = passageExits(robot);
         int exits = nonwallExits(robot);
+        int beenBefores = beenBeforeExits(robot);
 
         if (exits > 2){
             if (passages > 0){
+                direction = atJunction(robot);
+                robot.face(direction);
                 explorerMode = 1;
-                exploreControl(robot);
             }
             else{
-                int heading = RobotDataEx2.retrieveJunctionHeading();
+                int heading = RobotDataEx3.retrieveJunctionHeading();
                 robot.setHeading(heading);
             }
         }
@@ -239,29 +283,32 @@ public class Ex2 {
 
 
 
-class RobotDataEx2 {
+class RobotDataEx3 {
 
     private static int junctionCounter = 0; // No. of junctions stored
-    private static ArrayList<JunctionHeader> junctionHeaderArray = new ArrayList<JunctionHeader>();
+    private static ArrayList<JunctionHeaderEx3> junctionHeaderArray = new ArrayList<JunctionHeaderEx3>();
 
     public static int getJunctionCounter(){
         return junctionCounter;
     }
+
 
     public void resetJunctionData() {
         junctionCounter = 0;
         junctionHeaderArray.clear();
     }
 
+
     public void recordJunctionHeader(int arrived) {
         
-        JunctionHeader newJunctionHeader = new JunctionHeader(arrived);
+        JunctionHeaderEx3 newJunctionHeader = new JunctionHeaderEx3(arrived);
         newJunctionHeader.printJunctionHeader();
 
         junctionHeaderArray.add(newJunctionHeader);
         System.out.println("Storing: " + junctionHeaderArray.get(junctionCounter) + "  " + junctionCounter + " "+ (junctionHeaderArray.get(junctionCounter)).getArrived());
         junctionCounter++;
     }
+
 
     public void deleteJunctionHeader(){
         System.out.println("Deleting: " + junctionHeaderArray.get(junctionCounter-1));
@@ -271,10 +318,11 @@ class RobotDataEx2 {
         junctionCounter--;
     }
 
+
     public int retrieveJunctionHeading() {
         int header;
         try{
-            JunctionHeader currentJunction = junctionHeaderArray.get(junctionCounter-1);
+            JunctionHeaderEx3 currentJunction = junctionHeaderArray.get(junctionCounter-1);
             header = currentJunction.getArrived();
             System.out.println("Retrieving "+ currentJunction + "  "+(junctionCounter-1) + " " + header);
             deleteJunctionHeader();
@@ -291,11 +339,11 @@ class RobotDataEx2 {
 
 
 
-class JunctionHeader{
+class JunctionHeaderEx3{
 
     private int arrived;
 
-    public JunctionHeader(int arrived){
+    public JunctionHeaderEx3(int arrived){
         this.arrived = getAbsoluteHeading(arrived);
     }
 
@@ -343,7 +391,7 @@ class JunctionHeader{
         }
 
 
-        System.out.println("Junction " + (RobotDataEx2.getJunctionCounter()+1) +  " heading "+ arrivedString);
+        System.out.println("Junction " + (RobotDataEx3.getJunctionCounter()+1) +  " heading "+ arrivedString);
     }
 
 }

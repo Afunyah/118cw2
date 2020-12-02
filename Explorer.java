@@ -52,7 +52,6 @@ public class Explorer {
 
         if ( (beenBefores == 1) && (exits > 2) ){    //at a previously unecountered junction/crossroad 
             robotData.recordJunction(robot.getLocation().x, robot.getLocation().y, robot.getHeading());
-            //JunctionRecorder.printJunction();
         }
 
         switch (exits){
@@ -206,7 +205,7 @@ public class Explorer {
          
             do {
                 randno = (int) (Math.random()*4); //probabilty is reduced but still the same for the 3 options
-                direction = lookDirections[randno];;
+                direction = lookDirections[randno];
                 } while (robot.look(direction) != IRobot.PASSAGE);
         
 
@@ -239,7 +238,6 @@ public class Explorer {
 
 class RobotData {
 
-    private static int maxJunctions = 10000; // Max number likely to occur
     private static int junctionCounter = 0; // No. of junctions stored
     private static JunctionRecorder[] junctionRecorderArray = new JunctionRecorder[maxJunctions];
 
@@ -247,8 +245,9 @@ class RobotData {
         return junctionCounter;
     }
 
-    public void resetJunctionCounter() {
+    public void resetJunctionData() {
         junctionCounter = 0;
+        junctionRecorderArray.clear();
     }
 
     public void recordJunction(int robotX, int robotY, int arrived) {
@@ -256,15 +255,15 @@ class RobotData {
         JunctionRecorder newJunction = new JunctionRecorder(robotX, robotY, arrived);
         newJunction.printJunction();
 
-        junctionRecorderArray[junctionCounter] = newJunction;
+        junctionRecorderArray.add(newJunction);
         junctionCounter++;
     }
 
     public int searchJunction(int robotX, int robotY) {
         int heading = 0;
-        for(int i = 0; i < maxJunctions; i++){
-            if ( (junctionRecorderArray[i].getJuncX() == robotX) && (junctionRecorderArray[i].getJuncY() == robotY) ){
-                heading = junctionRecorderArray[i].getArrived();
+        for(int i = 0; i < junctionRecorderArray.size(); i++){
+            if ( (junctionRecorderArray.get(i).getJuncX() == robotX) && (junctionRecorderArray.get(i).getJuncY() == robotY) ){
+                heading = junctionRecorderArray.get(i).getArrived();
                 break;
             }
         }
@@ -311,14 +310,6 @@ class JunctionRecorder {
             absDir = heading - 2;
         }
 
-        // try {
-        //     absDir = heading + 2;
-            
-        // } catch(Exception e){
-        //     absDir = heading - 2;
-        // }
-
-
         // switch (heading){
         //     case IRobot.NORTH:  absDir = IRobot.SOUTH;
         //                         break;
@@ -347,17 +338,6 @@ class JunctionRecorder {
                 continue;
             }
         }
-
-        // switch (arrived){
-        //     case IRobot.NORTH: arrivedString = "NORTH";
-        //                         break;
-        //     case IRobot.SOUTH: arrivedString = "SOUTH";
-        //                         break;
-        //     case IRobot.EAST: arrivedString = "EAST";
-        //                         break;
-        //     case IRobot.WEST: arrivedString = "WEST";
-        //                         break;     
-        // }
 
         System.out.println("Junction " + (RobotData.getJunctionCounter()+1) + " (x="+ juncX + ",y=" + juncY + ") heading "+ arrivedString);
     }
