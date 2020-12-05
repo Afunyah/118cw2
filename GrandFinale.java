@@ -49,7 +49,6 @@ public class GrandFinale {
         RobotDataFinale.resetJunctionData();
         explorerMode = 1;
         pollRun = 0;
-        //System.out.println("****************RESET**************");
     }
 
 
@@ -59,7 +58,7 @@ public class GrandFinale {
         switch (exits){
             case 2:
                 try{
-                    if( (robot.look(IRobot.AHEAD) == IRobot.WALL) && (robot.look(IRobot.BEHIND) != IRobot.WALL) || (robot.look(IRobot.AHEAD) != IRobot.WALL) && (robot.look(IRobot.BEHIND) == IRobot.WALL) ){
+                    if( (robot.look(IRobot.AHEAD) == IRobot.WALL) && (robot.look(IRobot.BEHIND) != IRobot.WALL) || (robot.look(IRobot.AHEAD) != IRobot.WALL) && (robot.look(IRobot.BEHIND) == IRobot.WALL) ){ //second for if start in L
                         int header = RobotDataFinale.retrievePersistentHeader();
                         robot.setHeading(header);
                     }
@@ -140,7 +139,6 @@ public class GrandFinale {
         int direction = 0;
         int passages = pathTypeCheck(robot, IRobot.PASSAGE);
         int exits = pathTypeCheck(robot, IRobot.WALL);
-        int beenBefores = pathTypeCheck(robot, IRobot.BEENBEFORE);
 
         if (exits > 2){
             if (passages > 0){
@@ -154,17 +152,17 @@ public class GrandFinale {
             }
         }
         else if (exits == 2){
-            if( (robot.look(IRobot.AHEAD) == IRobot.WALL) && (robot.look(IRobot.BEHIND) != IRobot.WALL) && beenBefores == 2){
+            if( (robot.look(IRobot.AHEAD) == IRobot.WALL) && (robot.look(IRobot.BEHIND) != IRobot.WALL) && passages == 0){
                 int heading = RobotDataFinale.retrieveJunctionHeader();
                 robot.setHeading(heading);
-            } else {
-                if(beenBefores == 1){
+            } 
+            else {
+                if(passages == 1){
                     explorerMode = 1; //for l junc, start then bt to junc then turn to normal junc
                 }
                 direction = atCorridor(robot);
                 robot.face(direction);
             }
-
         }
         else{
             direction = atDeadEnd(robot);
@@ -202,7 +200,6 @@ public class GrandFinale {
                 pathCounter++;
             }
 		}
-
         if(pathType == IRobot.WALL){
             pathCounter = 4 - pathCounter;
         }

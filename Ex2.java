@@ -1,10 +1,6 @@
 import uk.ac.warwick.dcs.maze.logic.IRobot;
 import java.util.ArrayList;
 
-//Check feedback to confirm whether random approach of selecting exits was appropriate
-//Better explore control backtrack cintrol interface 
-//ARRIVED STRING FOR LOOP EXERCISE 1
-//WHAT HAPEN WHEN START ON JUNCTION CENTR EXERCISE 1
 
 public class Ex2 {
 
@@ -35,9 +31,9 @@ public class Ex2 {
 
 
     public void reset() {
-        //System.out.println("****************RESET**************");
         RobotDataEx2.resetJunctionData();
         explorerMode = 1;
+        pollRun = 0;
     }
 
 
@@ -54,35 +50,21 @@ public class Ex2 {
             case 1: 
                     if (beenBefores == 1){ 
                         explorerMode = 0;
-                    }else{
-                        direction = atDeadEnd(robot);
-                    }      
+                    }
+                    direction = atDeadEnd(robot);      
                     break;
 
             case 2: direction = atCorridor(robot);
                     break;
 
             case 3: 
-                    if (beenBefores == 3){
-                        explorerMode = 0;
-                    }
             case 4: 
             default:
-                    if (beenBefores == 4){
-                        explorerMode = 0;
-                    } else{
-                        direction = atJunction(robot);
-                    }
+                    direction = atJunction(robot);
                     break;
         }
 
-
-        if(explorerMode == 0){
-            backtrackControl(robot);
-        }else{
-            robot.face(direction);
-        }
-        
+        robot.face(direction);
     }
 
 

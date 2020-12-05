@@ -37,9 +37,9 @@ public class Ex3 {
 
 
     public void reset() {
-        //System.out.println("****************RESET**************");
         RobotDataEx3.resetJunctionData();
         explorerMode = 1;
+        pollRun = 0;
     }
 
 
@@ -62,7 +62,7 @@ public class Ex3 {
             case 3: 
             case 4: 
             default: 
-                    if (beenBefores < 3){
+                    if (beenBefores < 3){  //bb 2 not included though
                         RobotDataEx3.recordJunction(robot.getHeading());
                         direction = atJunction(robot);
                     }
