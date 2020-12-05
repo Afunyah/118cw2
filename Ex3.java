@@ -37,7 +37,7 @@ public class Ex3 {
 
 
     public void reset() {
-        System.out.println("****************RESET**************");
+        //System.out.println("****************RESET**************");
         RobotDataEx3.resetJunctionData();
         explorerMode = 1;
     }
@@ -51,11 +51,9 @@ public class Ex3 {
         switch (exits){
             case 1: 
                     if (beenBefores == 1){ 
-                        direction = IRobot.BEHIND;
                         explorerMode = 0;
-                    }else{
-                        direction = atDeadEnd(robot);
-                    }      
+                    }
+                    direction = atDeadEnd(robot);
                     break;
 
             case 2: direction = atCorridor(robot);
@@ -127,39 +125,35 @@ public class Ex3 {
 
     private int atDeadEnd (IRobot robot){
 
-        int direction = 0;
-        
-        for(int i = 0; i < 4; i++){
-            if(robot.look(lookDirections[i]) != IRobot.WALL){
-                direction = lookDirections[i];
-                break;
-            }
-        }
+        int direction;
+        int i = 0;
+//starting position considered
+        do{
+            direction = lookDirections[i];
+            i++;
+        } while ( robot.look(direction) == IRobot.WALL );
+
         return direction;
     }
 
 
     private int atCorridor (IRobot robot){
 
-        int direction;
         //The specs do not mention choosing a random direction when starting out in the middle of a corrider, with the walls ahead and behind.
 
-        if (robot.look(IRobot.LEFT) != IRobot.WALL){
-            direction = IRobot.LEFT;
-        }
-        else if (robot.look(IRobot.RIGHT) != IRobot.WALL){
-            direction = IRobot.RIGHT;
-        }
-        else{
-            direction = IRobot.AHEAD;
-        }
+        int direction;
+        int i = 0;
+
+        do{
+            direction = lookDirections[i];
+            i++;
+        } while ( (robot.look(direction) == IRobot.WALL) || (direction == IRobot.BEHIND) );
 
         return direction;
     }
 
 
     private int atJunction (IRobot robot){
-        int passages = pathTypeCheck(robot, IRobot.PASSAGE);
         int direction;
         int randno;
 
@@ -171,12 +165,6 @@ public class Ex3 {
         return direction;
     }
 
-
-    // private int atCrossroad (IRobot robot){
-        
-    //     return atJunction(robot);
-
-    // }
 
 }
 
@@ -201,7 +189,7 @@ class RobotDataEx3 {
     public void recordJunction(int arrived) {
         
         JunctionRecorderEx3 JunctionRecorder = new JunctionRecorderEx3(arrived);
-        JunctionRecorder.printJunction();
+        //JunctionRecorder.printJunction();
 
         junctionRecorderArray.add(JunctionRecorder);
         junctionCounter++;

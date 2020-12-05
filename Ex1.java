@@ -36,7 +36,7 @@ public class Ex1 {
 
 
     public void reset() {
-        System.out.println("****************RESET**************");
+        //System.out.println("****************RESET**************");
         RobotDataEx1.resetJunctionData();
         explorerMode = 1;
     }
@@ -133,39 +133,35 @@ public class Ex1 {
 
     private int atDeadEnd (IRobot robot){
 
-        int direction = 0;
-        
-        for(int i = 0; i < 4; i++){
-            if(robot.look(lookDirections[i]) != IRobot.WALL){
-                direction = lookDirections[i];
-                break;
-            }
-        }
+        int direction;
+        int i = 0;
+//starting position considered
+        do{
+            direction = lookDirections[i];
+            i++;
+        } while ( robot.look(direction) == IRobot.WALL );
+
         return direction;
     }
 
 
     private int atCorridor (IRobot robot){
 
-        int direction;
         //The specs do not mention choosing a random direction when starting out in the middle of a corrider, with the walls ahead and behind.
 
-        if (robot.look(IRobot.LEFT) != IRobot.WALL){
-            direction = IRobot.LEFT;
-        }
-        else if (robot.look(IRobot.RIGHT) != IRobot.WALL){
-            direction = IRobot.RIGHT;
-        }
-        else{
-            direction = IRobot.AHEAD;
-        }
+        int direction;
+        int i = 0;
+
+        do{
+            direction = lookDirections[i];
+            i++;
+        } while ( (robot.look(direction) == IRobot.WALL) || (direction == IRobot.BEHIND) );
 
         return direction;
     }
 
 
     private int atJunction (IRobot robot){
-        int passages = pathTypeCheck(robot, IRobot.PASSAGE);
         int direction;
         int randno;
 
@@ -177,13 +173,6 @@ public class Ex1 {
         return direction;
     }
 
-
-    // private int atCrossroad (IRobot robot){
-    //     return atJunction(robot);
-    // }
-
-
-
 }
 
 
@@ -191,7 +180,7 @@ public class Ex1 {
 class RobotDataEx1 {
 
     private static int junctionCounter = 0; // No. of junctions stored
-    private static ArrayList<JunctionRecorder> junctionRecorderArray = new ArrayList<JunctionRecorder>();
+    private static ArrayList<JunctionRecorderEx1> junctionRecorderArray = new ArrayList<JunctionRecorderEx1>();
 
     public static int getJunctionCounter(){
         return junctionCounter;
@@ -203,10 +192,9 @@ class RobotDataEx1 {
     }
 
     public void recordJunction(int robotX, int robotY, int arrived) {
-        
-        JunctionRecorder newJunction = new JunctionRecorder(robotX, robotY, arrived);
-        newJunction.printJunction();
 
+        JunctionRecorderEx1 newJunction = new JunctionRecorderEx1(robotX, robotY, arrived);
+        //newJunction.printJunction();
         junctionRecorderArray.add(newJunction);
         junctionCounter++;
     }
@@ -227,13 +215,13 @@ class RobotDataEx1 {
 
 
 
-class JunctionRecorder {
+class JunctionRecorderEx1 {
 
     private int juncX; // X-coordinates of the junctions
     private int juncY; // Y-coordinates of the junctions
     private int arrived; // Heading the robot first arrived from (Absolute)
 
-    public JunctionRecorder(int juncX, int juncY, int arrived){
+    public JunctionRecorderEx1(int juncX, int juncY, int arrived){
 
         this.juncX = juncX;
         this.juncY = juncY;

@@ -1,7 +1,6 @@
 import uk.ac.warwick.dcs.maze.logic.IRobot;
 import java.util.ArrayList;
 
-//Function that checks all 4 walls for a specific condition eg passage wall beenbefore
 //Check feedback to confirm whether random approach of selecting exits was appropriate
 //Better explore control backtrack cintrol interface 
 //ARRIVED STRING FOR LOOP EXERCISE 1
@@ -36,7 +35,7 @@ public class Ex2 {
 
 
     public void reset() {
-        System.out.println("****************RESET**************");
+        //System.out.println("****************RESET**************");
         RobotDataEx2.resetJunctionData();
         explorerMode = 1;
     }
@@ -132,43 +131,36 @@ public class Ex2 {
 
 
     private int atDeadEnd (IRobot robot){
-
-        int direction = 0;
-        
-        for(int i = 0; i < 4; i++){
-            if(robot.look(lookDirections[i]) != IRobot.WALL){
-                direction = lookDirections[i];
-                break;
-            }
-        }
+        int direction;
+        int i = 0;
+//starting position considered
+        do{
+            direction = lookDirections[i];
+            i++;
+        } while ( robot.look(direction) == IRobot.WALL );
+ 
         return direction;
     }
 
 
     private int atCorridor (IRobot robot){
-
-        int direction;
+        
         //The specs do not mention choosing a random direction when starting out in the middle of a corrider, with the walls ahead and behind.
+        int direction;
+        int i = 0;
 
-        if (robot.look(IRobot.LEFT) != IRobot.WALL){
-            direction = IRobot.LEFT;
-        }
-        else if (robot.look(IRobot.RIGHT) != IRobot.WALL){
-            direction = IRobot.RIGHT;
-        }
-        else{
-            direction = IRobot.AHEAD;
-        }
+        do{
+            direction = lookDirections[i];
+            i++;
+        } while ( (robot.look(direction) == IRobot.WALL) || (direction == IRobot.BEHIND) );
 
         return direction;
     }
 
 
     private int atJunction (IRobot robot){
-        int passages = pathTypeCheck(robot, IRobot.PASSAGE);
         int direction;
         int randno;
-
          
             do {
                 randno = (int) (Math.random()*4); //probabilty is reduced but still the same for the 3 options
@@ -178,15 +170,6 @@ public class Ex2 {
 
         return direction;
     }
-
-
-    // private int atCrossroad (IRobot robot){
-        
-    //     return atJunction(robot);
-
-    // }
-
-
 
 }
 
@@ -209,7 +192,7 @@ class RobotDataEx2 {
     public void recordJunction(int arrived) {
         
         JunctionRecorderEx2 newJunctionRecorder = new JunctionRecorderEx2(arrived);
-        newJunctionRecorder.printJunction();
+        //newJunctionRecorder.printJunction();
 
         junctionRecorderArray.add(newJunctionRecorder);
         junctionCounter++;
